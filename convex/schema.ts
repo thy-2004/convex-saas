@@ -43,6 +43,7 @@ const pricesValidator = v.object({
 
 const schema = defineSchema({
   ...authTables,
+
   users: defineTable({
     name: v.optional(v.string()),
     username: v.optional(v.string()),
@@ -57,6 +58,7 @@ const schema = defineSchema({
   })
     .index("email", ["email"])
     .index("customerId", ["customerId"]),
+
   plans: defineTable({
     key: planKeyValidator,
     stripeId: v.string(),
@@ -69,6 +71,7 @@ const schema = defineSchema({
   })
     .index("key", ["key"])
     .index("stripeId", ["stripeId"]),
+
   subscriptions: defineTable({
     userId: v.id("users"),
     planId: v.id("plans"),
@@ -83,6 +86,23 @@ const schema = defineSchema({
   })
     .index("userId", ["userId"])
     .index("stripeId", ["stripeId"]),
+
+  /* --------------------------
+       ADD THIS PART ONLY
+     -------------------------- */
+  apiKeys: defineTable({
+  name: v.string(),
+  description: v.optional(v.string()),
+  key: v.string(),
+  createdAt: v.number(),
+  userId: v.string(),   // ← ✔ FIX
+})
+  .index("by_user", ["userId"])
+  .index("by_key", ["key"]),
+
+
 });
 
+
 export default schema;
+

@@ -16,12 +16,10 @@ import { Doc } from "@cvx/_generated/dataModel";
 
 const http = httpRouter();
 
-/**
- * Gets and constructs a Stripe event signature.
- *
- * @throws An error if Stripe signature is missing or if event construction fails.
- * @returns The Stripe event object.
- */
+/* ============================================================
+   STRIPE HELPERS
+   ============================================================ */
+
 async function getStripeEvent(request: Request) {
   if (!STRIPE_WEBHOOK_SECRET) {
     throw new Error(`Stripe - ${ERRORS.ENVS_NOT_INITIALIZED}`);
@@ -53,7 +51,7 @@ const handleUpdateSubscription = async (
     userId: user._id,
     subscriptionStripeId: subscription.id,
     input: {
-      currency: subscription.items.data[0].price.currency as Currency,
+      currency: subscriptionItem.price.currency as Currency,
       planStripeId: subscriptionItem.plan.product as string,
       priceStripeId: subscriptionItem.price.id,
       interval: subscriptionItem.plan.interval as Interval,
@@ -96,8 +94,6 @@ const handleCheckoutSessionCompleted = async (
     subscriptionId,
   });
 
-  // Cancel free subscription. — User upgraded to a paid plan.
-  // Not required, but it's a good practice to keep just a single active plan.
   const subscriptions = (
     await stripe.subscriptions.list({ customer: customerId })
   ).data.map((sub) => sub.items);
@@ -129,7 +125,7 @@ const handleCheckoutSessionCompletedError = async (
   const user = await ctx.runQuery(internal.stripe.PREAUTH_getUserByCustomerId, {
     customerId,
   });
-  if (!user?.email) throw new Error(ERRORS.STRIPE_SOMETHING_WENT_WRONG);
+  if (!user?.email) throw new Error(ERRORS.SOMETHING_WENT_WRONG);
 
   await sendSubscriptionErrorEmail({
     email: user.email,
@@ -170,7 +166,7 @@ const handleCustomerSubscriptionUpdatedError = async (
   const user = await ctx.runQuery(internal.stripe.PREAUTH_getUserByCustomerId, {
     customerId,
   });
-  if (!user?.email) throw new Error(ERRORS.STRIPE_SOMETHING_WENT_WRONG);
+  if (!user?.email) throw new Error(ERRORS.SOMETHING_WENT_WRONG);
 
   await sendSubscriptionErrorEmail({
     email: user.email,
@@ -190,6 +186,10 @@ const handleCustomerSubscriptionDeleted = async (
   return new Response(null);
 };
 
+/* ============================================================
+   STRIPE WEBHOOK ROUTE
+   ============================================================ */
+
 http.route({
   path: "/stripe/webhook",
   method: "POST",
@@ -198,37 +198,22 @@ http.route({
 
     try {
       switch (event.type) {
-        /**
-         * Occurs when a Checkout Session has been successfully completed.
-         */
-        case "checkout.session.completed": {
+        case "checkout.session.completed":
           return handleCheckoutSessionCompleted(ctx, event);
-        }
 
-        /**
-         * Occurs when a Stripe subscription has been updated.
-         * E.g. when a user upgrades or downgrades their plan.
-         */
-        case "customer.subscription.updated": {
+        case "customer.subscription.updated":
           return handleCustomerSubscriptionUpdated(ctx, event);
-        }
 
-        /**
-         * Occurs whenever a customer’s subscription ends.
-         */
-        case "customer.subscription.deleted": {
+        case "customer.subscription.deleted":
           return handleCustomerSubscriptionDeleted(ctx, event);
-        }
       }
     } catch (err: unknown) {
       switch (event.type) {
-        case "checkout.session.completed": {
+        case "checkout.session.completed":
           return handleCheckoutSessionCompletedError(ctx, event);
-        }
 
-        case "customer.subscription.updated": {
+        case "customer.subscription.updated":
           return handleCustomerSubscriptionUpdatedError(ctx, event);
-        }
       }
 
       throw err;
@@ -237,6 +222,41 @@ http.route({
     return new Response(null);
   }),
 });
+
+/* ============================================================
+   🌟 PUBLIC API ROUTE (DÙNG API KEY)
+   ============================================================ */
+
+http.route({
+  path: "/public_api",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const header = request.headers.get("Authorization");
+
+    if (!header?.startsWith("Bearer ")) {
+      return new Response("Missing API Key", { status: 401 });
+    }
+
+    const apiKey = header.replace("Bearer ", "").trim();
+
+    // dùng index by_key
+const record = await ctx.runQuery(internal.apiKeysPriv.getByKey, {
+  key: apiKey,
+});
+
+
+    if (!record) {
+      return new Response("Invalid API Key", { status: 403 });
+    }
+
+    return Response.json({
+      message: "API Key authenticated!",
+      appName: record.name,
+      ownerId: record.userId,
+    });
+  }),
+});
+
 
 auth.addHttpRoutes(http);
 
