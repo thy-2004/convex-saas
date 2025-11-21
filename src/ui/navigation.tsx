@@ -6,6 +6,7 @@ import {
   Settings,
   LogOut,
 } from "lucide-react";
+import { CreateMenu } from "@/ui/create-menu";
 import { cn, useSignOut } from "@/utils/misc";
 import { ThemeSwitcher } from "@/ui/theme-switcher";
 import { LanguageSwitcher } from "@/ui/language-switcher";
@@ -130,6 +131,12 @@ export function Navigation({ user }: { user: User }) {
         </div>
 
         <div className="flex h-10 items-center gap-3">
+          <a
+            href="https://github.com/get-convex/convex-saas/tree/main/docs"
+            className={cn(
+              `${buttonVariants({ variant: "outline", size: "sm" })} group hidden h-8 gap-2 rounded-full bg-transparent px-2 pr-2.5 md:flex`,
+            )}
+          ></a>
           <a
             href="https://github.com/get-convex/convex-saas/tree/main/docs"
             className={cn(

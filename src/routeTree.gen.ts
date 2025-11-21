@@ -20,10 +20,13 @@ import { Route as AppLoginLayoutImport } from './routes/_app/login/_layout'
 import { Route as AppLoginLayoutIndexImport } from './routes/_app/login/_layout.index'
 import { Route as AppAuthOnboardingLayoutImport } from './routes/_app/_auth/onboarding/_layout'
 import { Route as AppAuthDashboardLayoutImport } from './routes/_app/_auth/dashboard/_layout'
+import { Route as AppAuthDashboardAppsIndexImport } from './routes/_app/_auth/dashboard/apps/index'
 import { Route as AppAuthDashboardLayoutIndexImport } from './routes/_app/_auth/dashboard/_layout.index'
 import { Route as AppAuthOnboardingLayoutUsernameImport } from './routes/_app/_auth/onboarding/_layout.username'
+import { Route as AppAuthDashboardAppsLayoutImport } from './routes/_app/_auth/dashboard/apps/layout'
 import { Route as AppAuthDashboardLayoutSettingsImport } from './routes/_app/_auth/dashboard/_layout.settings'
 import { Route as AppAuthDashboardLayoutCheckoutImport } from './routes/_app/_auth/dashboard/_layout.checkout'
+import { Route as AppAuthDashboardAppsAppIdIndexImport } from './routes/_app/_auth/dashboard/apps/$appId/index'
 import { Route as AppAuthDashboardLayoutSettingsIndexImport } from './routes/_app/_auth/dashboard/_layout.settings.index'
 import { Route as AppAuthDashboardLayoutSettingsBillingImport } from './routes/_app/_auth/dashboard/_layout.settings.billing'
 
@@ -85,6 +88,11 @@ const AppAuthDashboardLayoutRoute = AppAuthDashboardLayoutImport.update({
   getParentRoute: () => AppAuthDashboardRoute,
 } as any)
 
+const AppAuthDashboardAppsIndexRoute = AppAuthDashboardAppsIndexImport.update({
+  path: '/apps/',
+  getParentRoute: () => AppAuthDashboardRoute,
+} as any)
+
 const AppAuthDashboardLayoutIndexRoute =
   AppAuthDashboardLayoutIndexImport.update({
     path: '/',
@@ -97,6 +105,13 @@ const AppAuthOnboardingLayoutUsernameRoute =
     getParentRoute: () => AppAuthOnboardingLayoutRoute,
   } as any)
 
+const AppAuthDashboardAppsLayoutRoute = AppAuthDashboardAppsLayoutImport.update(
+  {
+    path: '/apps/layout',
+    getParentRoute: () => AppAuthDashboardRoute,
+  } as any,
+)
+
 const AppAuthDashboardLayoutSettingsRoute =
   AppAuthDashboardLayoutSettingsImport.update({
     path: '/settings',
@@ -107,6 +122,12 @@ const AppAuthDashboardLayoutCheckoutRoute =
   AppAuthDashboardLayoutCheckoutImport.update({
     path: '/checkout',
     getParentRoute: () => AppAuthDashboardLayoutRoute,
+  } as any)
+
+const AppAuthDashboardAppsAppIdIndexRoute =
+  AppAuthDashboardAppsAppIdIndexImport.update({
+    path: '/apps/$appId/',
+    getParentRoute: () => AppAuthDashboardRoute,
   } as any)
 
 const AppAuthDashboardLayoutSettingsIndexRoute =
@@ -209,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuthDashboardLayoutSettingsImport
       parentRoute: typeof AppAuthDashboardLayoutImport
     }
+    '/_app/_auth/dashboard/apps/layout': {
+      id: '/_app/_auth/dashboard/apps/layout'
+      path: '/apps/layout'
+      fullPath: '/dashboard/apps/layout'
+      preLoaderRoute: typeof AppAuthDashboardAppsLayoutImport
+      parentRoute: typeof AppAuthDashboardImport
+    }
     '/_app/_auth/onboarding/_layout/username': {
       id: '/_app/_auth/onboarding/_layout/username'
       path: '/username'
@@ -223,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuthDashboardLayoutIndexImport
       parentRoute: typeof AppAuthDashboardLayoutImport
     }
+    '/_app/_auth/dashboard/apps/': {
+      id: '/_app/_auth/dashboard/apps/'
+      path: '/apps'
+      fullPath: '/dashboard/apps'
+      preLoaderRoute: typeof AppAuthDashboardAppsIndexImport
+      parentRoute: typeof AppAuthDashboardImport
+    }
     '/_app/_auth/dashboard/_layout/settings/billing': {
       id: '/_app/_auth/dashboard/_layout/settings/billing'
       path: '/billing'
@@ -236,6 +271,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/settings/'
       preLoaderRoute: typeof AppAuthDashboardLayoutSettingsIndexImport
       parentRoute: typeof AppAuthDashboardLayoutSettingsImport
+    }
+    '/_app/_auth/dashboard/apps/$appId/': {
+      id: '/_app/_auth/dashboard/apps/$appId/'
+      path: '/apps/$appId'
+      fullPath: '/dashboard/apps/$appId'
+      preLoaderRoute: typeof AppAuthDashboardAppsAppIdIndexImport
+      parentRoute: typeof AppAuthDashboardImport
     }
   }
 }
@@ -256,6 +298,9 @@ export const routeTree = rootRoute.addChildren({
             }),
           AppAuthDashboardLayoutIndexRoute,
         }),
+        AppAuthDashboardAppsLayoutRoute,
+        AppAuthDashboardAppsIndexRoute,
+        AppAuthDashboardAppsAppIdIndexRoute,
       }),
       AppAuthOnboardingRoute: AppAuthOnboardingRoute.addChildren({
         AppAuthOnboardingLayoutRoute: AppAuthOnboardingLayoutRoute.addChildren({
@@ -319,7 +364,10 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_app/_auth/dashboard",
       "parent": "/_app/_auth",
       "children": [
-        "/_app/_auth/dashboard/_layout"
+        "/_app/_auth/dashboard/_layout",
+        "/_app/_auth/dashboard/apps/layout",
+        "/_app/_auth/dashboard/apps/",
+        "/_app/_auth/dashboard/apps/$appId/"
       ]
     },
     "/_app/_auth/dashboard/_layout": {
@@ -361,6 +409,10 @@ export const routeTree = rootRoute.addChildren({
         "/_app/_auth/dashboard/_layout/settings/"
       ]
     },
+    "/_app/_auth/dashboard/apps/layout": {
+      "filePath": "_app/_auth/dashboard/apps/layout.tsx",
+      "parent": "/_app/_auth/dashboard"
+    },
     "/_app/_auth/onboarding/_layout/username": {
       "filePath": "_app/_auth/onboarding/_layout.username.tsx",
       "parent": "/_app/_auth/onboarding/_layout"
@@ -369,6 +421,10 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_app/_auth/dashboard/_layout.index.tsx",
       "parent": "/_app/_auth/dashboard/_layout"
     },
+    "/_app/_auth/dashboard/apps/": {
+      "filePath": "_app/_auth/dashboard/apps/index.tsx",
+      "parent": "/_app/_auth/dashboard"
+    },
     "/_app/_auth/dashboard/_layout/settings/billing": {
       "filePath": "_app/_auth/dashboard/_layout.settings.billing.tsx",
       "parent": "/_app/_auth/dashboard/_layout/settings"
@@ -376,6 +432,10 @@ export const routeTree = rootRoute.addChildren({
     "/_app/_auth/dashboard/_layout/settings/": {
       "filePath": "_app/_auth/dashboard/_layout.settings.index.tsx",
       "parent": "/_app/_auth/dashboard/_layout/settings"
+    },
+    "/_app/_auth/dashboard/apps/$appId/": {
+      "filePath": "_app/_auth/dashboard/apps/$appId/index.tsx",
+      "parent": "/_app/_auth/dashboard"
     }
   }
 }

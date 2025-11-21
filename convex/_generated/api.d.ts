@@ -14,7 +14,10 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as apiKeys from "../apiKeys.js";
+import type * as apiKeysPriv from "../apiKeysPriv.js";
 import type * as app from "../app.js";
+import type * as apps from "../apps.js";
 import type * as auth from "../auth.js";
 import type * as email_index from "../email/index.js";
 import type * as email_templates_subscriptionEmail from "../email/templates/subscriptionEmail.js";
@@ -35,7 +38,10 @@ import type * as stripe from "../stripe.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  apiKeys: typeof apiKeys;
+  apiKeysPriv: typeof apiKeysPriv;
   app: typeof app;
+  apps: typeof apps;
   auth: typeof auth;
   "email/index": typeof email_index;
   "email/templates/subscriptionEmail": typeof email_templates_subscriptionEmail;
