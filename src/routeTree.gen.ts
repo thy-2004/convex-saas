@@ -19,7 +19,6 @@ import { Route as AppAuthImport } from './routes/_app/_auth'
 import { Route as AppLoginLayoutImport } from './routes/_app/login/_layout'
 import { Route as AppLoginLayoutIndexImport } from './routes/_app/login/_layout.index'
 import { Route as AppAuthOnboardingLayoutImport } from './routes/_app/_auth/onboarding/_layout'
-import { Route as AppAuthDashboardApiKeysImport } from './routes/_app/_auth/dashboard/api-keys'
 import { Route as AppAuthDashboardLayoutImport } from './routes/_app/_auth/dashboard/_layout'
 import { Route as AppAuthDashboardLayoutIndexImport } from './routes/_app/_auth/dashboard/_layout.index'
 import { Route as AppAuthOnboardingLayoutUsernameImport } from './routes/_app/_auth/onboarding/_layout.username'
@@ -79,11 +78,6 @@ const AppLoginLayoutIndexRoute = AppLoginLayoutIndexImport.update({
 const AppAuthOnboardingLayoutRoute = AppAuthOnboardingLayoutImport.update({
   id: '/_layout',
   getParentRoute: () => AppAuthOnboardingRoute,
-} as any)
-
-const AppAuthDashboardApiKeysRoute = AppAuthDashboardApiKeysImport.update({
-  path: '/api-keys',
-  getParentRoute: () => AppAuthDashboardRoute,
 } as any)
 
 const AppAuthDashboardLayoutRoute = AppAuthDashboardLayoutImport.update({
@@ -180,13 +174,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuthDashboardLayoutImport
       parentRoute: typeof AppAuthDashboardRoute
     }
-    '/_app/_auth/dashboard/api-keys': {
-      id: '/_app/_auth/dashboard/api-keys'
-      path: '/api-keys'
-      fullPath: '/dashboard/api-keys'
-      preLoaderRoute: typeof AppAuthDashboardApiKeysImport
-      parentRoute: typeof AppAuthDashboardImport
-    }
     '/_app/_auth/onboarding': {
       id: '/_app/_auth/onboarding'
       path: '/onboarding'
@@ -269,7 +256,6 @@ export const routeTree = rootRoute.addChildren({
             }),
           AppAuthDashboardLayoutIndexRoute,
         }),
-        AppAuthDashboardApiKeysRoute,
       }),
       AppAuthOnboardingRoute: AppAuthOnboardingRoute.addChildren({
         AppAuthOnboardingLayoutRoute: AppAuthOnboardingLayoutRoute.addChildren({
@@ -333,8 +319,7 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_app/_auth/dashboard",
       "parent": "/_app/_auth",
       "children": [
-        "/_app/_auth/dashboard/_layout",
-        "/_app/_auth/dashboard/api-keys"
+        "/_app/_auth/dashboard/_layout"
       ]
     },
     "/_app/_auth/dashboard/_layout": {
@@ -345,10 +330,6 @@ export const routeTree = rootRoute.addChildren({
         "/_app/_auth/dashboard/_layout/settings",
         "/_app/_auth/dashboard/_layout/"
       ]
-    },
-    "/_app/_auth/dashboard/api-keys": {
-      "filePath": "_app/_auth/dashboard/api-keys.tsx",
-      "parent": "/_app/_auth/dashboard"
     },
     "/_app/_auth/onboarding": {
       "filePath": "_app/_auth/onboarding",

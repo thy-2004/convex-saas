@@ -19,9 +19,10 @@ type SubscriptionEmailOptions = {
   subscriptionId: string;
 };
 
-/**
- * Templates.
- */
+/* -------------------------------------------------------------------------- */
+/*                               TEMPLATE: SUCCESS                            */
+/* -------------------------------------------------------------------------- */
+
 export function SubscriptionSuccessEmail({ email }: SubscriptionEmailOptions) {
   return (
     <Html>
@@ -61,6 +62,10 @@ export function SubscriptionSuccessEmail({ email }: SubscriptionEmailOptions) {
     </Html>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*                               TEMPLATE: ERROR                              */
+/* -------------------------------------------------------------------------- */
 
 export function SubscriptionErrorEmail({ email }: SubscriptionEmailOptions) {
   return (
@@ -102,25 +107,31 @@ export function SubscriptionErrorEmail({ email }: SubscriptionEmailOptions) {
   );
 }
 
-/**
- * Renders.
- */
-export function renderSubscriptionSuccessEmail(args: SubscriptionEmailOptions) {
-  return render(<SubscriptionSuccessEmail {...args} />);
+/* -------------------------------------------------------------------------- */
+/*                                   RENDER                                   */
+/* -------------------------------------------------------------------------- */
+
+export async function renderSubscriptionSuccessEmail(
+  args: SubscriptionEmailOptions
+) {
+  return await render(<SubscriptionSuccessEmail {...args} />);
 }
 
-export function renderSubscriptionErrorEmail(args: SubscriptionEmailOptions) {
-  return render(<SubscriptionErrorEmail {...args} />);
+export async function renderSubscriptionErrorEmail(
+  args: SubscriptionEmailOptions
+) {
+  return await render(<SubscriptionErrorEmail {...args} />);
 }
 
-/**
- * Senders.
- */
+/* -------------------------------------------------------------------------- */
+/*                                   SENDERS                                  */
+/* -------------------------------------------------------------------------- */
+
 export async function sendSubscriptionSuccessEmail({
   email,
   subscriptionId,
 }: SubscriptionEmailOptions) {
-  const html = renderSubscriptionSuccessEmail({ email, subscriptionId });
+  const html = await renderSubscriptionSuccessEmail({ email, subscriptionId });
 
   await sendEmail({
     to: email,
@@ -133,7 +144,7 @@ export async function sendSubscriptionErrorEmail({
   email,
   subscriptionId,
 }: SubscriptionEmailOptions) {
-  const html = renderSubscriptionErrorEmail({ email, subscriptionId });
+  const html = await renderSubscriptionErrorEmail({ email, subscriptionId });
 
   await sendEmail({
     to: email,
