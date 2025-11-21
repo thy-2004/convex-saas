@@ -223,39 +223,8 @@ http.route({
   }),
 });
 
-/* ============================================================
-   🌟 PUBLIC API ROUTE (DÙNG API KEY)
-   ============================================================ */
-
-http.route({
-  path: "/public_api",
-  method: "GET",
-  handler: httpAction(async (ctx, request) => {
-    const header = request.headers.get("Authorization");
-
-    if (!header?.startsWith("Bearer ")) {
-      return new Response("Missing API Key", { status: 401 });
-    }
-
-    const apiKey = header.replace("Bearer ", "").trim();
-
-    // dùng index by_key
-const record = await ctx.runQuery(internal.apiKeysPriv.getByKey, {
-  key: apiKey,
-});
 
 
-    if (!record) {
-      return new Response("Invalid API Key", { status: 403 });
-    }
-
-    return Response.json({
-      message: "API Key authenticated!",
-      appName: record.name,
-      ownerId: record.userId,
-    });
-  }),
-});
 
 
 auth.addHttpRoutes(http);

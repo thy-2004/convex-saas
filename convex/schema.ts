@@ -90,15 +90,13 @@ const schema = defineSchema({
   /* --------------------------
        ADD THIS PART ONLY
      -------------------------- */
-  apiKeys: defineTable({
-  name: v.string(),
-  description: v.optional(v.string()),
-  key: v.string(),
-  createdAt: v.number(),
-  userId: v.string(),   // ← ✔ FIX
-})
-  .index("by_user", ["userId"])
-  .index("by_key", ["key"]),
+    apps: defineTable({
+    name: v.string(),
+    region: v.string(),
+    ownerId: v.id("users"),
+    createdAt: v.number(),
+  }).index("by_owner", ["ownerId"]),
+
 
 
 });
