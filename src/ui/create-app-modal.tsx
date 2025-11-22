@@ -8,6 +8,7 @@ import { Button } from "@/ui/button";
 import { useMutation } from "convex/react";
 import { api } from "@cvx/_generated/api";
 import { useState } from "react";
+import { router } from "@/router"; // ⭐ Quan trọng: thêm import này
 
 interface CreateAppModalProps {
   open: boolean;
@@ -22,9 +23,20 @@ export function CreateAppModal({ open, onClose }: CreateAppModalProps) {
   const [desc, setDesc] = useState("");
 
   const submit = async () => {
-    await createApp({ name, region });
-    onClose();
-  };
+  const created = await createApp({
+    name,
+    region,
+    description: desc,
+  });
+
+  router.navigate({
+    to: "/dashboard/apps/$appId/",
+    params: { appId: created },   // ⭐ ID trực tiếp
+  });
+
+  onClose();
+};
+
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -49,33 +61,24 @@ export function CreateAppModal({ open, onClose }: CreateAppModalProps) {
         </div>
 
         {/* Region */}
-    <div className="space-y-1">
-    <label className="text-sm font-medium text-primary">Region</label>
-
-    <select
-        className="w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm focus:ring-2 focus:ring-primary/40"
-        value={region}
-        onChange={(e) => setRegion(e.target.value)}
-    >
-        {/* 🇻🇳 VIETNAM REGIONS */}
-        <option value="vn-central-1">🇻🇳 Vietnam Central (Hanoi)</option>
-        <option value="vn-south-1">🇻🇳 Vietnam South (Ho Chi Minh)</option>
-
-        {/* 🇺🇸 US REGIONS */}
-        <option value="us-east-1">🇺🇸 US East (N. Virginia)</option>
-        <option value="us-west-1">🇺🇸 US West (California)</option>
-
-        {/* 🇪🇺 EU REGIONS */}
-        <option value="eu-west-1">🇪🇺 EU West (Ireland)</option>
-        <option value="eu-central-1">🇩🇪 EU Central (Frankfurt)</option>
-
-        {/* 🌏 ASIA PACIFIC */}
-        <option value="ap-southeast-1">🇸🇬 AP Southeast (Singapore)</option>
-        <option value="ap-northeast-1">🇯🇵 AP Northeast (Tokyo)</option>
-        <option value="ap-south-1">🇮🇳 AP South (Mumbai)</option>
-    </select>
-    </div>
-
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-primary">Region</label>
+          <select
+            className="w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm focus:ring-2 focus:ring-primary/40"
+            value={region}
+            onChange={(e) => setRegion(e.target.value)}
+          >
+            <option value="vn-central-1">🇻🇳 Vietnam Central (Hanoi)</option>
+            <option value="vn-south-1">🇻🇳 Vietnam South (Ho Chi Minh)</option>
+            <option value="us-east-1">🇺🇸 US East (N. Virginia)</option>
+            <option value="us-west-1">🇺🇸 US West (California)</option>
+            <option value="eu-west-1">🇪🇺 EU West (Ireland)</option>
+            <option value="eu-central-1">🇩🇪 EU Central (Frankfurt)</option>
+            <option value="ap-southeast-1">🇸🇬 AP Southeast (Singapore)</option>
+            <option value="ap-northeast-1">🇯🇵 AP Northeast (Tokyo)</option>
+            <option value="ap-south-1">🇮🇳 AP South (Mumbai)</option>
+          </select>
+        </div>
 
         {/* Description */}
         <div className="space-y-1">

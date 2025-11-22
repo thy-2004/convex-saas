@@ -7,6 +7,7 @@ export const createApp = mutation({
   args: {
     name: v.string(),
     region: v.string(),
+    description: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await auth.getUserId(ctx);
@@ -15,6 +16,7 @@ export const createApp = mutation({
     return await ctx.db.insert("apps", {
       name: args.name,
       region: args.region,
+      description: args.description,
       ownerId: userId,
       createdAt: Date.now(),
     });
