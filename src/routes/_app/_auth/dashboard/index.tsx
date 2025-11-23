@@ -27,7 +27,7 @@ export default function Dashboard() {
               {apps.map((app) => (
                 <Link
                   key={app._id}
-                  to="/_app/_auth/dashboard/apps/$appId"
+                  to="/_app/_auth/dashboard/apps/$appId/"
                   params={{ appId: app._id }}
                   className="block p-4 rounded-lg border border-border bg-card hover:bg-muted"
                 >

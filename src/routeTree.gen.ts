@@ -134,7 +134,7 @@ const AppAuthDashboardLayoutCheckoutRoute =
 const AppAuthDashboardAppsAppIdIndexRoute =
   AppAuthDashboardAppsAppIdIndexImport.update({
     path: '/',
-    getParentRoute: () => AppAuthDashboardAppsAppIdLayoutRoute,
+    getParentRoute: () => AppAuthDashboardAppsAppIdRoute,
   } as any)
 
 const AppAuthDashboardLayoutSettingsIndexRoute =
@@ -329,10 +329,7 @@ export const routeTree = rootRoute.addChildren({
         AppAuthDashboardAppsIndexRoute,
         AppAuthDashboardAppsAppIdRoute:
           AppAuthDashboardAppsAppIdRoute.addChildren({
-            AppAuthDashboardAppsAppIdLayoutRoute:
-              AppAuthDashboardAppsAppIdLayoutRoute.addChildren({
-                AppAuthDashboardAppsAppIdIndexRoute,
-              }),
+            AppAuthDashboardAppsAppIdIndexRoute,
           }),
       }),
       AppAuthOnboardingRoute: AppAuthOnboardingRoute.addChildren({
