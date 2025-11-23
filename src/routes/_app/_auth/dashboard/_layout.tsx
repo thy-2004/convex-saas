@@ -11,11 +11,11 @@ export const Route = createFileRoute("/_app/_auth/dashboard/_layout")({
 
 function DashboardLayout() {
   const { data: user } = useQuery(convexQuery(api.app.getCurrentUser, {}));
-  if (!user) {
-    return null;
-  }
+
+  if (!user) return null;
+
   return (
-    <div className="flex min-h-[100vh] w-full flex-col bg-secondary dark:bg-black">
+    <div className="flex min-h-screen w-full flex-col bg-secondary dark:bg-black">
       <Navigation user={user} />
       <Header />
       <Outlet />

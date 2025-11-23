@@ -6,7 +6,6 @@ import {
   Settings,
   LogOut,
 } from "lucide-react";
-import { CreateMenu } from "@/ui/create-menu";
 import { cn, useSignOut } from "@/utils/misc";
 import { ThemeSwitcher } from "@/ui/theme-switcher";
 import { LanguageSwitcher } from "@/ui/language-switcher";

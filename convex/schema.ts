@@ -97,9 +97,93 @@ const schema = defineSchema({
     ownerId: v.id("users"),
     createdAt: v.number(),
   }).index("by_owner", ["ownerId"]),
+    // User nội bộ của từng app
+  appUsers: defineTable({
+    appId: v.id("apps"),
+    email: v.string(),
+    name: v.optional(v.string()),
+    roleId: v.optional(v.id("roles")),
+    createdAt: v.number(),
+  })
+    .index("by_app", ["appId"])
+    .index("by_email", ["appId", "email"]),
+
+  // Tổ chức trong app
+  organizations: defineTable({
+    appId: v.id("apps"),
+    name: v.string(),
+    ownerUserId: v.optional(v.id("appUsers")),
+    createdAt: v.number(),
+  }).index("by_app", ["appId"]),
+
+  // Workspace thuộc organization
+ workspaces: defineTable({
+    appId: v.id("apps"),
+    name: v.string(),
+    slug: v.string(),
+    createdAt: v.number(),
+  }).index("by_app", ["appId"]),
+
+  
+
+  // Email template
+  emailTemplates: defineTable({
+    appId: v.id("apps"),
+    name: v.string(),
+    subject: v.string(),
+    body: v.string(),
+    createdAt: v.number(),
+  }).index("by_app", ["appId"]),
+
+  // Gói subscription riêng theo app (không đụng bảng plans cũ)
+  appPlans: defineTable({
+    appId: v.id("apps"),
+    name: v.string(),
+    description: v.optional(v.string()),
+    priceMonthly: v.number(),
+    priceYearly: v.optional(v.number()),
+    currency: currencyValidator,
+    createdAt: v.number(),
+  }).index("by_app", ["appId"]),
+
+  // Thông tin deployment
+  deployments: defineTable({
+    appId: v.id("apps"),
+    name: v.string(),
+    region: v.string(),
+    url: v.string(),
+    status: v.string(), // "active", "inactive", "error", ...
+    createdAt: v.number(),
+  }).index("by_app", ["appId"]),
+
+  // Role & permission
+  roles: defineTable({
+    appId: v.id("apps"),
+    name: v.string(),
+    description: v.optional(v.string()),
+    permissions: v.array(v.string()), // ví dụ ["users.read", "users.write"]
+    createdAt: v.number(),
+  }).index("by_app", ["appId"]),
 
 
+  appSettings: defineTable({
+    appId: v.id("apps"),
+    environment: v.string(), // "production" | "development" 
+    region: v.string(),
+    updatedAt: v.number(),
+  }).index("by_app", ["appId"]),
 
+  apiKeys: defineTable({
+    appId: v.id("apps"),
+    type: v.string(), // "public" | "secret" | "webhook"
+    key: v.string(),
+    active: v.boolean(),
+    createdAt: v.number(),   
+    name: v.string(),
+    lastUsedAt: v.optional(v.number()),
+  })
+    .index("by_app", ["appId"])
+    .index("by_key", ["key"]),
 });
 
 

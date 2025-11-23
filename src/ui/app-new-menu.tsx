@@ -1,4 +1,3 @@
-// src/ui/app-new-menu.tsx
 import { Button } from "@/ui/button";
 import {
   DropdownMenu,
@@ -14,27 +13,36 @@ import { Id } from "@cvx/_generated/dataModel";
 export default function AppNewMenu({ appId }: { appId: Id<"apps"> }) {
   const router = useRouter();
 
+  const go = (to: string) => {
+    router.navigate({ to: to as any, params: { appId } });
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button className="flex items-center gap-2">
           <Plus className="w-4 h-4" />
-          New
+          Actions ▾
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-56">
+      <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem
-          onClick={() =>
-            alert("New User (demo — bạn tự thêm modal hoặc route sau)")
-          }
-        >
-          New User
-        </DropdownMenuItem>
+            onClick={() =>
+              router.navigate({
+                to: "/_app/_auth/dashboard/apps/$appId/users/new",
+                params: { appId },
+              })
+            }
+          >
+            New User
+          </DropdownMenuItem>
 
+
+        {/* Các item khác tạm để TODO, sẽ làm module sau */}
         <DropdownMenuItem
           onClick={() =>
-            alert("New Organization (demo — bạn tự thêm modal hoặc route sau)")
+            go("/_app/_auth/dashboard/apps/$appId/organizations/new")
           }
         >
           New Organization
@@ -42,7 +50,7 @@ export default function AppNewMenu({ appId }: { appId: Id<"apps"> }) {
 
         <DropdownMenuItem
           onClick={() =>
-            alert("New Workspace (demo — bạn thêm route sau)")
+            go("/_app/_auth/dashboard/apps/$appId/workspaces/new")
           }
         >
           New Workspace
@@ -50,7 +58,7 @@ export default function AppNewMenu({ appId }: { appId: Id<"apps"> }) {
 
         <DropdownMenuItem
           onClick={() =>
-            alert("New API Key (demo — bạn tự thêm chức năng sau)")
+            go("/_app/_auth/dashboard/apps/$appId/api-keys/new")
           }
         >
           New API Key
@@ -58,7 +66,9 @@ export default function AppNewMenu({ appId }: { appId: Id<"apps"> }) {
 
         <DropdownMenuItem
           onClick={() =>
-            alert("New Email Template (demo)")
+            go(
+              "/_app/_auth/dashboard/apps/$appId/email-templates/new",
+            )
           }
         >
           New Email Template
@@ -66,7 +76,7 @@ export default function AppNewMenu({ appId }: { appId: Id<"apps"> }) {
 
         <DropdownMenuItem
           onClick={() =>
-            alert("New Subscription Plan (demo)")
+            go("/_app/_auth/dashboard/apps/$appId/plans/new")
           }
         >
           New Subscription Plan
@@ -74,7 +84,7 @@ export default function AppNewMenu({ appId }: { appId: Id<"apps"> }) {
 
         <DropdownMenuItem
           onClick={() =>
-            alert("New Deployment (demo)")
+            go("/_app/_auth/dashboard/apps/$appId/deployments/new")
           }
         >
           New Deployment
@@ -82,7 +92,7 @@ export default function AppNewMenu({ appId }: { appId: Id<"apps"> }) {
 
         <DropdownMenuItem
           onClick={() =>
-            alert("New Role / Permission (demo)")
+            go("/_app/_auth/dashboard/apps/$appId/roles/new")
           }
         >
           New Role / Permission

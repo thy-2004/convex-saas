@@ -14,9 +14,12 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as apiKeys from "../apiKeys.js";
 import type * as app from "../app.js";
 import type * as apps from "../apps.js";
+import type * as appUsers from "../appUsers.js";
 import type * as auth from "../auth.js";
+import type * as deployments from "../deployments.js";
 import type * as email_index from "../email/index.js";
 import type * as email_templates_subscriptionEmail from "../email/templates/subscriptionEmail.js";
 import type * as env from "../env.js";
@@ -25,7 +28,9 @@ import type * as init from "../init.js";
 import type * as lib_getCurrentUserId from "../lib/getCurrentUserId.js";
 import type * as otp_ResendOTP from "../otp/ResendOTP.js";
 import type * as otp_VerificationCodeEmail from "../otp/VerificationCodeEmail.js";
+import type * as roles from "../roles.js";
 import type * as stripe from "../stripe.js";
+import type * as workspaces from "../workspaces.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -36,9 +41,12 @@ import type * as stripe from "../stripe.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  apiKeys: typeof apiKeys;
   app: typeof app;
   apps: typeof apps;
+  appUsers: typeof appUsers;
   auth: typeof auth;
+  deployments: typeof deployments;
   "email/index": typeof email_index;
   "email/templates/subscriptionEmail": typeof email_templates_subscriptionEmail;
   env: typeof env;
@@ -47,7 +55,9 @@ declare const fullApi: ApiFromModules<{
   "lib/getCurrentUserId": typeof lib_getCurrentUserId;
   "otp/ResendOTP": typeof otp_ResendOTP;
   "otp/VerificationCodeEmail": typeof otp_VerificationCodeEmail;
+  roles: typeof roles;
   stripe: typeof stripe;
+  workspaces: typeof workspaces;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

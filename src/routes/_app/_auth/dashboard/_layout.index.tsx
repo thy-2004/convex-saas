@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/utils/misc.js";
@@ -26,19 +26,23 @@ export default function Dashboard() {
       <div className="z-10 mx-auto flex h-full w-full max-w-screen-xl gap-12">
         <div className="flex w-full flex-col rounded-lg border border-border bg-card dark:bg-black">
 
-          {/* ⭐ MOVE — Your Apps lên trước */}
+          {/* ⭐ Your Apps */}
           <div className="p-6 space-y-4">
             <h2 className="text-xl font-semibold">Your Apps</h2>
 
             <div className="space-y-2">
               {apps.map((app) => (
-                <div
+                <Link
                   key={app._id}
-                  className="p-4 rounded-lg border border-border bg-card cursor-pointer hover:bg-muted"
+                  to="/_app/_auth/dashboard/apps/$appId/"
+                  params={{ appId: app._id }}
+                  className="block p-4 rounded-lg border border-border bg-card hover:bg-muted cursor-pointer transition"
                 >
                   <p className="font-medium">{app.name}</p>
-                  <p className="text-sm text-primary/60">Region: {app.region}</p>
-                </div>
+                  <p className="text-sm text-primary/60">
+                    Region: {app.region}
+                  </p>
+                </Link>
               ))}
 
               {apps.length === 0 && (
@@ -52,7 +56,7 @@ export default function Dashboard() {
             <div className="w-full border-b border-border" />
           </div>
 
-          {/* ⭐ Get Started block giữ nguyên */}
+          {/* ⭐ Get Started block */}
           <div className="relative mx-auto flex w-full flex-col items-center p-6">
             <div className="relative flex w-full flex-col items-center justify-center gap-6 overflow-hidden rounded-lg border border-border bg-secondary px-6 py-24 dark:bg-card">
 
@@ -88,6 +92,7 @@ export default function Dashboard() {
               <div className="absolute bottom-0 h-full w-full bg-gradient-to-t from-[hsl(var(--card))] to-transparent" />
             </div>
           </div>
+
         </div>
       </div>
     </div>

@@ -1,56 +1,78 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ExternalLink } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { cn } from "@/utils/misc";
+import { buttonVariants } from "@/ui/button-util";
+import { CreateMenu } from "@/ui/create-menu";
 import { api } from "@cvx/_generated/api";
 import { useQuery } from "convex/react";
-import { Button } from "@/ui/button";
 
 export const Route = createFileRoute("/_app/_auth/dashboard/")({
-  component: DashboardPage,
+  component: Dashboard,
 });
 
-function DashboardPage() {
+export default function Dashboard() {
+  const { t } = useTranslation();
   const apps = useQuery(api.apps.listApps) ?? [];
 
   return (
-    <div className="px-6 py-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-primary">Dashboard</h1>
-          <p className="text-sm text-primary/60">
-            Manage your Apps and view your usage.
-          </p>
-        </div>
+    <div className="flex h-full w-full bg-secondary px-6 py-8 dark:bg-black">
+      <div className="mx-auto flex h-full w-full max-w-screen-xl gap-12">
+        <div className="flex w-full flex-col rounded-lg border border-border bg-card">
+          
+          <div className="p-6 space-y-4">
+            <h2 className="text-xl font-semibold">Your Apps</h2>
 
-        {/* Nút mở modal tạo app – bạn đã có component rồi thì gọi ở đây */}
-        {/* <CreateAppDialog /> */}
-      </div>
+            <div className="space-y-2">
+              {apps.map((app) => (
+                <Link
+                  key={app._id}
+                  to="/_app/_auth/dashboard/apps/$appId"
+                  params={{ appId: app._id }}
+                  className="block p-4 rounded-lg border border-border bg-card hover:bg-muted"
+                >
+                  <p className="font-medium">{app.name}</p>
+                  <p className="text-sm text-primary/60">Region: {app.region}</p>
+                </Link>
+              ))}
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold text-primary">Your Apps</h2>
-
-        <div className="grid grid-cols-1 gap-3">
-          {apps.map((app) => (
-            <Link
-              key={app._id}
-              to="/_app/_auth/dashboard/apps/$appId/"
-              params={{ appId: app._id }}
-              className="block rounded-lg border border-border bg-card px-4 py-3 hover:bg-secondary transition"
-            >
-              <div className="text-base font-medium">{app.name}</div>
-              <div className="text-sm text-primary/60">
-                Region: {app.region}
-              </div>
-            </Link>
-          ))}
-
-          {apps.length === 0 && (
-            <div className="rounded-lg border border-dashed border-border px-4 py-6 text-sm text-primary/60 text-center">
-              You don&apos;t have any apps yet.
-              <br />
-              Click <span className="font-medium">New App</span> to create one.
+              {apps.length === 0 && (
+                <p className="text-primary/60 text-sm">No apps yet.</p>
+              )}
             </div>
-          )}
+          </div>
+
+          {/* divider */}
+          <div className="w-full px-6">
+            <div className="w-full border-b border-border" />
+          </div>
+
+          {/* GET STARTED */}
+          <div className="relative mx-auto flex w-full flex-col items-center p-6">
+            <div className="relative flex w-full flex-col items-center gap-6 rounded-lg border border-border px-6 py-24">
+              
+              <CreateMenu />
+
+              <p className="text-base font-medium text-primary">{t("title")}</p>
+              <p className="text-center text-base text-primary/60">
+                {t("description")}
+              </p>
+
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://github.com/get-convex/convex-saas/tree/main/docs"
+                className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "gap-2")}
+              >
+                Explore Documentation
+                <ExternalLink className="h-4 w-4 text-primary/60" />
+              </a>
+
+            </div>
+          </div>
+
         </div>
-      </section>
+      </div>
     </div>
   );
 }
