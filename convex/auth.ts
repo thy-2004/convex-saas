@@ -12,6 +12,8 @@ export const { auth, signIn, signOut, store } = convexAuth({
       authorization: {
         params: { scope: "user:email" },
       },
+      
     }),
+    
   ],
 });
