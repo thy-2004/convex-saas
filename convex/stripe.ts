@@ -242,26 +242,54 @@ export const PREAUTH_createFreeStripeSubscription = internalAction({
     }
 
     const yearlyPrice = plan.prices.year[args.currency];
+    
+    // Check if this is a fallback plan (price ID starts with "fallback_")
+    const isFallbackPlan = yearlyPrice?.stripeId?.startsWith("fallback_") ?? false;
 
-    const stripeSubscription = await stripe.subscriptions.create({
-      customer: args.customerId,
-      items: [{ price: yearlyPrice?.stripeId }],
-    });
-    if (!stripeSubscription) {
-      throw new Error(ERRORS.STRIPE_SOMETHING_WENT_WRONG);
+    if (isFallbackPlan) {
+      // For fallback plans, create subscription in database only (no Stripe subscription)
+      console.log("Creating fallback subscription (database only, no Stripe subscription)");
+      const now = Math.floor(Date.now() / 1000);
+      const oneYearFromNow = now + 365 * 24 * 60 * 60; // 1 year from now
+      
+      await ctx.runMutation(internal.stripe.PREAUTH_createSubscription, {
+        userId: args.userId,
+        planId: plan._id,
+        currency: args.currency,
+        priceStripeId: yearlyPrice.stripeId,
+        stripeSubscriptionId: `fallback_sub_${args.userId}_${Date.now()}`,
+        status: "active",
+        interval: "year",
+        currentPeriodStart: now,
+        currentPeriodEnd: oneYearFromNow,
+        cancelAtPeriodEnd: false,
+      });
+    } else {
+      // For real Stripe plans, create subscription in Stripe
+      if (!yearlyPrice?.stripeId) {
+        throw new Error("Price not found for plan");
+      }
+
+      const stripeSubscription = await stripe.subscriptions.create({
+        customer: args.customerId,
+        items: [{ price: yearlyPrice.stripeId }],
+      });
+      if (!stripeSubscription) {
+        throw new Error(ERRORS.STRIPE_SOMETHING_WENT_WRONG);
+      }
+      await ctx.runMutation(internal.stripe.PREAUTH_createSubscription, {
+        userId: args.userId,
+        planId: plan._id,
+        currency: args.currency,
+        priceStripeId: stripeSubscription.items.data[0].price.id,
+        stripeSubscriptionId: stripeSubscription.id,
+        status: stripeSubscription.status,
+        interval: "year",
+        currentPeriodStart: stripeSubscription.current_period_start,
+        currentPeriodEnd: stripeSubscription.current_period_end,
+        cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
+      });
     }
-    await ctx.runMutation(internal.stripe.PREAUTH_createSubscription, {
-      userId: args.userId,
-      planId: plan._id,
-      currency: args.currency,
-      priceStripeId: stripeSubscription.items.data[0].price.id,
-      stripeSubscriptionId: stripeSubscription.id,
-      status: stripeSubscription.status,
-      interval: "year",
-      currentPeriodStart: stripeSubscription.current_period_start,
-      currentPeriodEnd: stripeSubscription.current_period_end,
-      cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
-    });
 
     await ctx.runMutation(internal.stripe.PREAUTH_updateCustomerId, {
       userId: args.userId,
@@ -311,9 +339,66 @@ export const createSubscriptionCheckout = action({
     currency: currencyValidator,
   },
   handler: async (ctx, args): Promise<string | undefined> => {
-    const user = await ctx.runQuery(api.app.getCurrentUser);
-    if (!user || !user.customerId) {
+    let user = await ctx.runQuery(api.app.getCurrentUser);
+    if (!user) {
       throw new Error(ERRORS.STRIPE_SOMETHING_WENT_WRONG);
+    }
+
+    // If user doesn't have customerId, create it first
+    if (!user.customerId) {
+      console.log("User doesn't have customerId, creating Stripe customer...");
+      
+      // Get user details for creating customer
+      const userDetails = await ctx.runQuery(internal.stripe.PREAUTH_getUserById, {
+        userId: user._id,
+      });
+      
+      if (!userDetails) {
+        throw new Error("User not found");
+      }
+      
+      // Validate Stripe key before creating customer
+      if (!STRIPE_SECRET_KEY) {
+        throw new Error("Stripe API key is not configured. Please set STRIPE_SECRET_KEY environment variable.");
+      }
+
+      // Create Stripe customer directly
+      let customer;
+      try {
+        customer = await stripe.customers.create({
+          email: userDetails.email,
+          name: userDetails.username,
+        });
+      } catch (error) {
+        console.error("Error creating Stripe customer:", error);
+        if (error instanceof Stripe.errors.StripeError) {
+          throw new Error(`Failed to create Stripe customer: ${error.message}`);
+        }
+        throw new Error("Failed to create Stripe customer. Please try again.");
+      }
+      
+      if (!customer) {
+        throw new Error("Failed to create Stripe customer");
+      }
+      
+      // Update user with customerId
+      await ctx.runMutation(internal.stripe.PREAUTH_updateCustomerId, {
+        userId: user._id,
+        customerId: customer.id,
+      });
+      
+      // Create free subscription
+      await ctx.runAction(internal.stripe.PREAUTH_createFreeStripeSubscription, {
+        userId: user._id,
+        customerId: customer.id,
+        currency: args.currency,
+      });
+      
+      // Refresh user data
+      user = await ctx.runQuery(api.app.getCurrentUser);
+      if (!user || !user.customerId) {
+        throw new Error("Failed to create Stripe customer. Please try again.");
+      }
     }
 
     const { currentSubscription, newPlan } = await ctx.runQuery(
@@ -323,24 +408,60 @@ export const createSubscriptionCheckout = action({
     if (!currentSubscription?.plan) {
       throw new Error(ERRORS.STRIPE_SOMETHING_WENT_WRONG);
     }
+    // Only allow checkout if user is on Free plan
     if (currentSubscription.plan.key !== PLANS.FREE) {
+      console.log("User is not on Free plan, cannot create checkout");
       return;
     }
 
     const price = newPlan?.prices[args.planInterval][args.currency];
-
-    const checkout = await stripe.checkout.sessions.create({
-      customer: user.customerId,
-      line_items: [{ price: price?.stripeId, quantity: 1 }],
-      mode: "subscription",
-      payment_method_types: ["card"],
-      success_url: `${SITE_URL}/dashboard/checkout`,
-      cancel_url: `${SITE_URL}/dashboard/settings/billing`,
-    });
-    if (!checkout) {
+    
+    if (!price || !price.stripeId) {
+      console.error("Price not found for plan:", {
+        planId: args.planId,
+        interval: args.planInterval,
+        currency: args.currency,
+      });
       throw new Error(ERRORS.STRIPE_SOMETHING_WENT_WRONG);
     }
-    return checkout.url || undefined;
+
+    // Check if this is a fallback plan (price ID starts with "fallback_")
+    const isFallbackPlan = price.stripeId.startsWith("fallback_");
+    
+    if (isFallbackPlan) {
+      throw new Error("This plan is not configured with Stripe. Please run the init function to set up Stripe integration, or contact support.");
+    }
+
+    try {
+      // Validate Stripe key
+      if (!STRIPE_SECRET_KEY) {
+        throw new Error("Stripe API key is not configured. Please set STRIPE_SECRET_KEY environment variable.");
+      }
+
+      const checkout = await stripe.checkout.sessions.create({
+        customer: user.customerId,
+        line_items: [{ price: price.stripeId, quantity: 1 }],
+        mode: "subscription",
+        payment_method_types: ["card"],
+        success_url: `${SITE_URL || "http://localhost:5173"}/dashboard/settings/billing?success=true`,
+        cancel_url: `${SITE_URL || "http://localhost:5173"}/dashboard/settings/billing?canceled=true`,
+      });
+      
+      if (!checkout || !checkout.url) {
+        throw new Error("Failed to create checkout session. Please try again.");
+      }
+      
+      return checkout.url;
+    } catch (error) {
+      console.error("Stripe API error:", error);
+      if (error instanceof Stripe.errors.StripeError) {
+        throw new Error(`Stripe error: ${error.message}`);
+      }
+      if (error instanceof Error) {
+        throw new Error(`Failed to create checkout: ${error.message}`);
+      }
+      throw new Error(ERRORS.STRIPE_SOMETHING_WENT_WRONG);
+    }
   },
 });
 

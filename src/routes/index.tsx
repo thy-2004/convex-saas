@@ -19,9 +19,9 @@ function Index() {
   const { isLoading, isAuthenticated } = useConvexAuth();
   const theme = "dark";
   return (
-    <div className="relative flex h-full w-full flex-col bg-card">
+    <div className="relative flex h-full w-full flex-col bg-card overflow-hidden">
       {/* Navigation */}
-      <div className="sticky top-0 z-50 mx-auto flex w-full max-w-screen-lg items-center justify-between p-6 py-3">
+      <div className="sticky top-0 z-50 mx-auto flex w-full max-w-screen-lg items-center justify-between p-6 py-3 backdrop-blur-md bg-card/80 border-b border-border/40">
         <Link to="/" className="flex h-10 items-center gap-1">
           <Logo />
         </Link>
@@ -100,18 +100,18 @@ function Index() {
       </div>
 
       {/* Content */}
-      <div className="z-10 mx-auto flex w-full max-w-screen-lg flex-col gap-4 px-6">
-        <div className="z-10 flex h-full w-full flex-col items-center justify-center gap-4 p-12 md:p-24">
+      <div className="z-10 mx-auto flex w-full max-w-screen-lg flex-col gap-8 px-6">
+        <div className="z-10 flex h-full w-full flex-col items-center justify-center gap-6 p-12 md:p-24">
           <Button
             variant="outline"
             className={cn(
-              "hidden h-8 rounded-full bg-white/40 px-3 text-sm font-bold backdrop-blur hover:text-primary dark:bg-secondary md:flex",
+              "hidden h-9 rounded-full bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 px-4 text-sm font-semibold backdrop-blur-md border-primary/20 hover:border-primary/40 hover:from-primary/20 hover:via-primary/10 hover:to-primary/20 transition-all duration-300 md:flex shadow-lg shadow-primary/5",
             )}
           >
-            <span className="flex items-center font-medium text-primary/60">
+            <span className="flex items-center font-medium text-primary">
               Introducing
               <svg
-                className="mx-1 h-[14px] w-[14px] text-primary"
+                className="mx-1.5 h-[14px] w-[14px] text-primary animate-pulse"
                 strokeLinejoin="round"
                 viewBox="0 0 16 16"
               >
@@ -125,23 +125,30 @@ function Index() {
             </span>
             {siteConfig.siteTitle}
           </Button>
-          <h1 className="text-center text-6xl font-bold leading-tight text-primary md:text-7xl lg:leading-tight">
+          <h1 className="text-center text-5xl font-extrabold leading-tight text-primary md:text-7xl lg:text-8xl lg:leading-tight bg-gradient-to-b from-primary via-primary to-primary/80 bg-clip-text text-transparent animate-fade-in">
             Production Ready
             <br />
-            SaaS Stack for Convex
+            <span className="bg-gradient-to-r from-primary via-primary/90 to-primary bg-clip-text text-transparent">
+              SaaS Stack for Convex
+            </span>
           </h1>
-          <p className="max-w-screen-md text-center text-lg !leading-normal text-muted-foreground md:text-xl">
+          <p className="max-w-screen-md text-center text-lg !leading-relaxed text-muted-foreground md:text-xl lg:text-2xl animate-fade-in">
             Launch in hours with a modern{" "}
-            <span className="font-medium text-primary">
+            <span className="font-semibold text-primary bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
               Production-Ready Stack
             </span>
-            <br className="hidden lg:inline-block" /> Stripe integration.
-            TanStack-powered. Open Source.
+            <br className="hidden lg:inline-block" />{" "}
+            <span className="text-muted-foreground">Stripe integration.</span>{" "}
+            <span className="text-muted-foreground">TanStack-powered.</span>{" "}
+            <span className="text-muted-foreground">Open Source.</span>
           </p>
-          <div className="mt-2 flex w-full items-center justify-center gap-2">
+          <div className="mt-4 flex w-full items-center justify-center gap-3 animate-fade-in">
             <Link
               to={AuthLoginRoute.fullPath}
-              className={cn(buttonVariants({ size: "sm" }), "hidden sm:flex")}
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "hidden sm:flex text-base px-8 py-6 h-auto font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:scale-105",
+              )}
             >
               Get Started
             </Link>
@@ -150,24 +157,24 @@ function Index() {
               target="_blank"
               rel="noreferrer"
               className={cn(
-                buttonVariants({ size: "sm", variant: "outline" }),
-                "hidden dark:bg-secondary dark:hover:opacity-80 sm:flex",
+                buttonVariants({ size: "lg", variant: "outline" }),
+                "hidden dark:bg-secondary/50 dark:hover:bg-secondary/70 dark:border-primary/30 sm:flex text-base px-8 py-6 h-auto font-semibold backdrop-blur-md hover:border-primary/50 transition-all duration-300 hover:scale-105",
               )}
             >
               Explore Documentation
             </a>
           </div>
         </div>
-        <div className="flex w-full flex-col items-center justify-center gap-2">
-          <h2 className="text-center font-serif text-xl font-medium text-primary/60">
+        <div className="flex w-full flex-col items-center justify-center gap-4 py-8">
+          <h2 className="text-center font-serif text-2xl md:text-3xl font-semibold text-primary/70 mb-4">
             Built for Developers
           </h2>
-          <div className="my-8 flex flex-wrap items-center justify-center gap-10 gap-y-8 lg:gap-14">
+          <div className="my-8 flex flex-wrap items-center justify-center gap-12 gap-y-10 lg:gap-16">
             <a
               target="_blank"
               rel="noreferrer"
               aria-label="Convex"
-              className="flex items-center text-primary opacity-80 grayscale transition hover:opacity-100"
+              className="flex items-center text-primary opacity-70 grayscale transition-all duration-300 hover:opacity-100 hover:grayscale-0 hover:scale-110"
               href="https://convex.dev/c/remixsaastemplate"
             >
               <div className="relative flex h-6 w-[148px] items-center justify-center">
@@ -226,7 +233,7 @@ function Index() {
               target="_blank"
               rel="noreferrer"
               aria-label="TanStack"
-              className="flex items-center text-primary opacity-80 grayscale transition hover:opacity-100"
+              className="flex items-center text-primary opacity-70 grayscale transition-all duration-300 hover:opacity-100 hover:grayscale-0 hover:scale-110"
               href="https://tanstack.com/?utm_source=remixconvexsaas"
             >
               <svg
@@ -377,7 +384,7 @@ function Index() {
               target="_blank"
               rel="noreferrer"
               aria-label="Stripe"
-              className="flex items-center text-primary opacity-80 grayscale transition hover:opacity-100"
+              className="flex items-center text-primary opacity-70 grayscale transition-all duration-300 hover:opacity-100 hover:grayscale-0 hover:scale-110"
               href="https://stripe.com"
             >
               <svg
@@ -398,7 +405,7 @@ function Index() {
               target="_blank"
               rel="noreferrer"
               aria-label="TailwindCSS"
-              className="flex items-center text-primary opacity-80 grayscale transition hover:opacity-100"
+              className="flex items-center text-primary opacity-70 grayscale transition-all duration-300 hover:opacity-100 hover:grayscale-0 hover:scale-110"
               href="https://tailwindcss.com"
             >
               <svg
@@ -426,7 +433,7 @@ function Index() {
               target="_blank"
               rel="noreferrer"
               aria-label="Resend"
-              className="flex items-center text-primary opacity-80 grayscale transition hover:opacity-100"
+              className="flex items-center text-primary opacity-70 grayscale transition-all duration-300 hover:opacity-100 hover:grayscale-0 hover:scale-110"
               href="https://resend.com"
             >
               <svg
@@ -466,7 +473,7 @@ function Index() {
               target="_blank"
               rel="noreferrer"
               aria-label="shadcn/ui"
-              className="flex items-center text-primary opacity-80 grayscale transition hover:opacity-100"
+              className="flex items-center text-primary opacity-70 grayscale transition-all duration-300 hover:opacity-100 hover:grayscale-0 hover:scale-110"
               href="https://ui.shadcn.com/"
             >
               <svg
@@ -501,32 +508,43 @@ function Index() {
             </a>
           </div>
         </div>
-        <div className="relative z-10 flex flex-col border border-border backdrop-blur-sm lg:flex-row">
-          <div className="flex w-full flex-col items-start justify-center gap-6 border-r border-primary/10 p-10 lg:p-12">
-            <p className="h-14 text-lg text-primary/60">
-              <span className="font-semibold text-primary">
+        <div className="relative z-10 flex flex-col border border-border/50 backdrop-blur-md bg-card/50 rounded-2xl overflow-hidden shadow-2xl shadow-primary/5 lg:flex-row hover:border-border transition-all duration-300">
+          <div className="flex w-full flex-col items-start justify-center gap-6 border-r border-primary/10 p-10 lg:p-12 bg-gradient-to-br from-primary/5 via-transparent to-transparent hover:from-primary/10 transition-all duration-300">
+            <p className="h-auto text-lg md:text-xl text-primary/70 leading-relaxed">
+              <span className="font-bold text-primary text-xl md:text-2xl">
                 Production Ready.
               </span>{" "}
-              Build your app on a solid, scalable, well-tested foundation.
+              <br className="md:hidden" />
+              <span className="text-muted-foreground">
+                Build your app on a solid, scalable, well-tested foundation.
+              </span>
             </p>
             <Link
               to={AuthLoginRoute.fullPath}
-              className={buttonVariants({ size: "sm" })}
+              className={cn(
+                buttonVariants({ size: "default" }),
+                "mt-2 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105",
+              )}
             >
               Get Started
             </Link>
           </div>
-          <div className="flex w-full flex-col items-start justify-center gap-6 p-10 lg:w-[60%] lg:border-b-0 lg:p-12">
-            <p className="h-14 text-lg text-primary/60">
-              <span className="font-semibold text-primary">Ready to Ship.</span>{" "}
-              Deployments ready with a single command.
+          <div className="flex w-full flex-col items-start justify-center gap-6 p-10 lg:w-[60%] lg:border-b-0 lg:p-12 bg-gradient-to-br from-primary/5 via-transparent to-transparent hover:from-primary/10 transition-all duration-300">
+            <p className="h-auto text-lg md:text-xl text-primary/70 leading-relaxed">
+              <span className="font-bold text-primary text-xl md:text-2xl">
+                Ready to Ship.
+              </span>{" "}
+              <br className="md:hidden" />
+              <span className="text-muted-foreground">
+                Deployments ready with a single command.
+              </span>
             </p>
             <a
               href="https://github.com/get-convex/convex-saas/tree/main/docs"
               target="_blank"
               rel="noreferrer"
               className={cn(
-                `${buttonVariants({ variant: "outline", size: "sm" })} dark:bg-secondary dark:hover:opacity-80`,
+                `${buttonVariants({ variant: "outline", size: "default" })} dark:bg-secondary/50 dark:hover:bg-secondary/70 dark:border-primary/30 mt-2 backdrop-blur-md hover:border-primary/50 transition-all duration-300 hover:scale-105`,
               )}
             >
               Explore Documentation
@@ -534,19 +552,19 @@ function Index() {
           </div>
 
           <div className="absolute left-0 top-0 z-10 flex flex-col items-center justify-center">
-            <span className="absolute h-6 w-[1px] bg-primary/40" />
-            <span className="absolute h-[1px] w-6 bg-primary/40" />
+            <span className="absolute h-8 w-[1px] bg-gradient-to-b from-primary/60 to-transparent" />
+            <span className="absolute h-[1px] w-8 bg-gradient-to-r from-primary/60 to-transparent" />
           </div>
           <div className="absolute bottom-0 right-0 z-10 flex flex-col items-center justify-center">
-            <span className="absolute h-6 w-[1px] bg-primary/40" />
-            <span className="absolute h-[1px] w-6 bg-primary/40" />
+            <span className="absolute h-8 w-[1px] bg-gradient-to-t from-primary/60 to-transparent" />
+            <span className="absolute h-[1px] w-8 bg-gradient-to-l from-primary/60 to-transparent" />
           </div>
         </div>
-        <div className="z-10 flex h-full w-full flex-col items-center justify-center gap-6 p-12">
-          <h1 className="text-center text-4xl font-bold leading-tight text-primary md:text-6xl">
+        <div className="z-10 flex h-full w-full flex-col items-center justify-center gap-6 p-12 md:p-16">
+          <h1 className="text-center text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-primary bg-gradient-to-b from-primary via-primary to-primary/80 bg-clip-text text-transparent">
             Proudly Open Source
           </h1>
-          <p className="text-center text-lg text-primary/60">
+          <p className="text-center text-lg md:text-xl text-primary/70 max-w-2xl leading-relaxed">
             Convex SaaS is a fully Open Source project.
             <br />
             The code is available on GitHub.
@@ -555,7 +573,7 @@ function Index() {
             href="https://github.com/get-convex/convex-saas"
             target="_blank"
             rel="noreferrer"
-            className="hidden h-10 select-none items-center gap-2 rounded-full bg-green-500/5 px-2 py-1 pr-2.5 text-base font-medium tracking-tight text-green-600 ring-1 ring-inset ring-green-600/20 backdrop-blur-sm dark:bg-yellow-800/40 dark:text-yellow-100 dark:ring-yellow-200/50 md:flex"
+            className="hidden h-12 select-none items-center gap-3 rounded-full bg-gradient-to-r from-green-500/10 via-green-500/5 to-green-500/10 px-6 py-3 pr-6 text-base font-semibold tracking-tight text-green-600 ring-2 ring-inset ring-green-600/30 backdrop-blur-md dark:from-yellow-800/40 dark:via-yellow-800/30 dark:to-yellow-800/40 dark:text-yellow-100 dark:ring-yellow-200/50 md:flex hover:scale-105 hover:ring-green-600/50 dark:hover:ring-yellow-200/70 transition-all duration-300 shadow-lg shadow-green-500/10 dark:shadow-yellow-500/10"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -629,10 +647,13 @@ function Index() {
       <img
         src={ShadowPNG}
         alt="Hero"
-        className={`fixed left-0 top-0 z-0 h-full w-full opacity-60 ${theme === "dark" ? "invert" : ""}`}
+        className={`fixed left-0 top-0 z-0 h-full w-full opacity-50 blur-3xl ${theme === "dark" ? "invert" : ""}`}
       />
-      <div className="base-grid fixed h-screen w-screen opacity-40" />
-      <div className="fixed bottom-0 h-screen w-screen bg-gradient-to-t from-[hsl(var(--card))] to-transparent" />
+      <div className="base-grid fixed h-screen w-screen opacity-30" />
+      <div className="fixed bottom-0 h-screen w-screen bg-gradient-to-t from-[hsl(var(--card))] via-[hsl(var(--card))]/80 to-transparent" />
+      {/* Gradient Orbs */}
+      <div className="fixed top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-50 animate-pulse" />
+      <div className="fixed bottom-1/4 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-50 animate-pulse" style={{ animationDelay: '1s' }} />
     </div>
   );
 }

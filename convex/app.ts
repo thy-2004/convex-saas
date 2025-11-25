@@ -125,20 +125,99 @@ export const getActivePlans = query({
   handler: async (ctx) => {
     const userId = await auth.getUserId(ctx);
     if (!userId) {
-      return;
+      return null;
     }
+    
+    // Try to get plans from database
     const [free, pro] = await asyncMap(
       [PLANS.FREE, PLANS.PRO] as const,
-      (key) =>
-        ctx.db
+      async (key) => {
+        const plan = await ctx.db
           .query("plans")
           .withIndex("key", (q) => q.eq("key", key))
-          .unique(),
+          .unique();
+        return plan;
+      },
     );
+    
+    // If plans don't exist, return null
+    // The frontend will show a message to initialize plans
     if (!free || !pro) {
-      throw new Error("Plan not found");
+      console.warn("Plans not found in database. Please run init function to seed plans.");
+      return null;
     }
+    
     return { free, pro };
+  },
+});
+
+// Mutation to create fallback plans (without Stripe integration)
+export const createFallbackPlans = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+    
+    // Check if plans already exist
+    const existingFree = await ctx.db
+      .query("plans")
+      .withIndex("key", (q) => q.eq("key", PLANS.FREE))
+      .unique();
+    const existingPro = await ctx.db
+      .query("plans")
+      .withIndex("key", (q) => q.eq("key", PLANS.PRO))
+      .unique();
+    
+    if (existingFree && existingPro) {
+      return { message: "Plans already exist", free: existingFree, pro: existingPro };
+    }
+    
+    // Create fallback FREE plan
+    const freePlanId = existingFree?._id || await ctx.db.insert("plans", {
+      key: PLANS.FREE,
+      stripeId: "fallback_free_" + Date.now(),
+      name: "Free",
+      description: "Start with the basics, upgrade anytime.",
+      prices: {
+        month: {
+          usd: { stripeId: "fallback_free_month_usd", amount: 0 },
+          eur: { stripeId: "fallback_free_month_eur", amount: 0 },
+        },
+        year: {
+          usd: { stripeId: "fallback_free_year_usd", amount: 0 },
+          eur: { stripeId: "fallback_free_year_eur", amount: 0 },
+        },
+      },
+    });
+    
+    // Create fallback PRO plan
+    const proPlanId = existingPro?._id || await ctx.db.insert("plans", {
+      key: PLANS.PRO,
+      stripeId: "fallback_pro_" + Date.now(),
+      name: "Pro",
+      description: "Access to all features and unlimited projects.",
+      prices: {
+        month: {
+          usd: { stripeId: "fallback_pro_month_usd", amount: 1990 },
+          eur: { stripeId: "fallback_pro_month_eur", amount: 1990 },
+        },
+        year: {
+          usd: { stripeId: "fallback_pro_year_usd", amount: 19990 },
+          eur: { stripeId: "fallback_pro_year_eur", amount: 19990 },
+        },
+      },
+    });
+    
+    const freePlan = existingFree || await ctx.db.get(freePlanId);
+    const proPlan = existingPro || await ctx.db.get(proPlanId);
+    
+    return { 
+      message: "Fallback plans created successfully", 
+      free: freePlan, 
+      pro: proPlan 
+    };
   },
 });
 

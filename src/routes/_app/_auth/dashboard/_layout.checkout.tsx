@@ -1,11 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Loader2, BadgeCheck, AlertTriangle, ExternalLink } from "lucide-react";
 import { buttonVariants } from "@/ui/button-util";
 import { useEffect, useState } from "react";
 import { Route as DashboardRoute } from "@/routes/_app/_auth/dashboard/_layout.index";
 import siteConfig from "~/site.config";
 import { PLANS } from "@cvx/schema";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@cvx/_generated/api";
 
@@ -17,6 +17,8 @@ export const Route = createFileRoute("/_app/_auth/dashboard/_layout/checkout")({
 });
 
 export default function DashboardCheckout() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { data: user } = useQuery(convexQuery(api.app.getCurrentUser, {}));
   const isFreePlan = user?.subscription?.planKey === PLANS.FREE;
   const [isPending, setIsPending] = useState(false);
@@ -24,12 +26,43 @@ export default function DashboardCheckout() {
   useEffect(() => {
     if (isFreePlan) {
       setIsPending(true);
+      // Poll for subscription update
+      const intervalId = setInterval(async () => {
+        // Refetch user data to check if subscription updated
+        const updatedUser = await queryClient.fetchQuery(
+          convexQuery(api.app.getCurrentUser, {})
+        );
+        if (updatedUser && updatedUser.subscription?.planKey !== PLANS.FREE) {
+          // Subscription updated, redirect to billing
+          clearInterval(intervalId);
+          navigate({
+            to: "/dashboard/settings/billing",
+            search: { success: "true" },
+          });
+        }
+      }, 2000);
+
+      // Timeout after 30 seconds
+      const timeoutId = setTimeout(() => {
+        clearInterval(intervalId);
+        setIsPending(false);
+      }, 30000);
+
+      return () => {
+        clearInterval(intervalId);
+        clearTimeout(timeoutId);
+      };
+    } else {
+      // Already upgraded, redirect to billing after 2 seconds
+      const timer = setTimeout(() => {
+        navigate({
+          to: "/dashboard/settings/billing",
+          search: { success: "true" },
+        });
+      }, 2000);
+      return () => clearTimeout(timer);
     }
-    const timeoutId = setTimeout(() => {
-      setIsPending(false);
-    }, 8000);
-    return () => clearTimeout(timeoutId);
-  }, []);
+  }, [isFreePlan, navigate, queryClient]);
 
   if (!user) {
     return null;
