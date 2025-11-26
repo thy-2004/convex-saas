@@ -6,7 +6,6 @@ import { buttonVariants } from "@/ui/button-util";
 import { CreateMenu } from "@/ui/create-menu";
 import { api } from "@cvx/_generated/api";
 import { useQuery } from "convex/react";
-import { Route as AppIdIndexRoute } from "@/routes/_app/_auth/dashboard/apps/$appId/index";
 
 export const Route = createFileRoute("/_app/_auth/dashboard/")({
   component: Dashboard,
