@@ -1,6 +1,7 @@
 // convex/appUsers.ts
 import { query, mutation } from "@cvx/_generated/server";
 import { v } from "convex/values";
+import { internal } from "@cvx/_generated/api";
 
 export const listUsers = query({
   args: { appId: v.id("apps") },
@@ -22,13 +23,23 @@ export const createUser = mutation({
   },
   async handler(ctx, args) {
     const now = Date.now();
-    return await ctx.db.insert("appUsers", {
+    const userId = await ctx.db.insert("appUsers", {
       appId: args.appId,
       email: args.email,
       name: args.name ?? "",
       roleId: args.roleId,
       createdAt: now,
     });
+
+    // Track analytics event
+    await ctx.runMutation(internal.analytics.trackEventInternal, {
+      appId: args.appId,
+      eventType: "user_created",
+      metadata: { email: args.email, name: args.name },
+      userId: userId,
+    });
+
+    return userId;
   },
 });
 
@@ -50,6 +61,17 @@ export const updateUser = mutation({
 export const deleteUser = mutation({
   args: { userId: v.id("appUsers") },
   async handler(ctx, args) {
+    const user = await ctx.db.get(args.userId);
+    if (!user) return;
+
     await ctx.db.delete(args.userId);
+
+    // Track analytics event
+    await ctx.runMutation(internal.analytics.trackEventInternal, {
+      appId: user.appId,
+      eventType: "user_deleted",
+      metadata: { email: user.email },
+      userId: args.userId,
+    });
   },
 });

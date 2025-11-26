@@ -4,3 +4,7 @@ export const HOST_URL = process.env.HOST_URL;
 export const SITE_URL = process.env.SITE_URL;
 export const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
+export const STRIPE_PRODUCT_FREE = process.env.STRIPE_PRODUCT_FREE;
+export const STRIPE_PRODUCT_PRO = process.env.STRIPE_PRODUCT_PRO;
+export const STRIPE_PRICE_FREE = process.env.STRIPE_PRICE_FREE;
+export const STRIPE_PRICE_PRO_MONTH = process.env.STRIPE_PRICE_PRO_MONTH;

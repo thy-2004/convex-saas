@@ -184,6 +184,47 @@ const schema = defineSchema({
   })
     .index("by_app", ["appId"])
     .index("by_key", ["key"]),
+
+  // Analytics events
+  analyticsEvents: defineTable({
+    appId: v.id("apps"),
+    eventType: v.string(), // "api_call", "error", "user_action", "deployment", etc.
+    metadata: v.optional(v.any()), // Flexible metadata object
+    userId: v.optional(v.id("appUsers")),
+    deploymentId: v.optional(v.id("deployments")),
+    timestamp: v.number(),
+  })
+    .index("by_app", ["appId"])
+    .index("by_app_type", ["appId", "eventType"])
+    .index("by_app_timestamp", ["appId", "timestamp"]),
+
+  // Analytics metrics (aggregated data for faster queries)
+  analyticsMetrics: defineTable({
+    appId: v.id("apps"),
+    date: v.string(), // YYYY-MM-DD format
+    metricType: v.string(), // "api_calls", "errors", "active_users", "response_time"
+    value: v.number(),
+    metadata: v.optional(v.any()),
+    updatedAt: v.number(),
+  })
+    .index("by_app", ["appId"])
+    .index("by_app_date", ["appId", "date"])
+    .index("by_app_type_date", ["appId", "metricType", "date"]),
+
+  // Environment Variables
+  environmentVariables: defineTable({
+    appId: v.id("apps"),
+    key: v.string(),
+    value: v.string(), // Encrypted for sensitive values
+    isEncrypted: v.boolean(),
+    environment: v.string(), // "development" | "staging" | "production" | "all"
+    description: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_app", ["appId"])
+    .index("by_app_env", ["appId", "environment"])
+    .index("by_app_key", ["appId", "key"]),
 });
 
 

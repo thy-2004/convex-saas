@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as analytics from "../analytics.js";
 import type * as apiKeys from "../apiKeys.js";
 import type * as app from "../app.js";
 import type * as appUsers from "../appUsers.js";
@@ -17,6 +18,7 @@ import type * as deployments from "../deployments.js";
 import type * as email_index from "../email/index.js";
 import type * as email_templates_subscriptionEmail from "../email/templates/subscriptionEmail.js";
 import type * as env from "../env.js";
+import type * as environmentVariables from "../environmentVariables.js";
 import type * as http from "../http.js";
 import type * as init from "../init.js";
 import type * as lib_getCurrentUserId from "../lib/getCurrentUserId.js";
@@ -33,6 +35,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  analytics: typeof analytics;
   apiKeys: typeof apiKeys;
   app: typeof app;
   appUsers: typeof appUsers;
@@ -42,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   "email/index": typeof email_index;
   "email/templates/subscriptionEmail": typeof email_templates_subscriptionEmail;
   env: typeof env;
+  environmentVariables: typeof environmentVariables;
   http: typeof http;
   init: typeof init;
   "lib/getCurrentUserId": typeof lib_getCurrentUserId;

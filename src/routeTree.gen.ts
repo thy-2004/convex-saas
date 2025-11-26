@@ -15,8 +15,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRoute } from './routes/__root'
 import { Route as AppImport } from './routes/_app'
 import { Route as IndexImport } from './routes/index'
+import { Route as AppLayoutImport } from './routes/_app/_layout'
 import { Route as AppAuthImport } from './routes/_app/_auth'
 import { Route as AppLoginLayoutImport } from './routes/_app/login/_layout'
+import { Route as AppAuthLayoutImport } from './routes/_app/_auth/_layout'
 import { Route as AppLoginLayoutIndexImport } from './routes/_app/login/_layout.index'
 import { Route as AppAuthDashboardIndexImport } from './routes/_app/_auth/dashboard/index'
 import { Route as AppAuthOnboardingLayoutImport } from './routes/_app/_auth/onboarding/_layout'
@@ -57,6 +59,11 @@ const AppLoginRoute = AppLoginImport.update({
   getParentRoute: () => AppRoute,
 } as any)
 
+const AppLayoutRoute = AppLayoutImport.update({
+  id: '/_layout',
+  getParentRoute: () => AppRoute,
+} as any)
+
 const AppAuthRoute = AppAuthImport.update({
   id: '/_auth',
   getParentRoute: () => AppRoute,
@@ -75,6 +82,11 @@ const AppAuthDashboardRoute = AppAuthDashboardImport.update({
 const AppLoginLayoutRoute = AppLoginLayoutImport.update({
   id: '/_layout',
   getParentRoute: () => AppLoginRoute,
+} as any)
+
+const AppAuthLayoutRoute = AppAuthLayoutImport.update({
+  id: '/_layout',
+  getParentRoute: () => AppAuthRoute,
 } as any)
 
 const AppLoginLayoutIndexRoute = AppLoginLayoutIndexImport.update({
@@ -179,6 +191,20 @@ declare module '@tanstack/react-router' {
       fullPath: ''
       preLoaderRoute: typeof AppAuthImport
       parentRoute: typeof AppImport
+    }
+    '/_app/_layout': {
+      id: '/_app/_layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AppLayoutImport
+      parentRoute: typeof AppImport
+    }
+    '/_app/_auth/_layout': {
+      id: '/_app/_auth/_layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AppAuthLayoutImport
+      parentRoute: typeof AppAuthImport
     }
     '/_app/login': {
       id: '/_app/login'
@@ -365,6 +391,7 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_app.tsx",
       "children": [
         "/_app/_auth",
+        "/_app/_layout",
         "/_app/login"
       ]
     },
@@ -372,9 +399,18 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_app/_auth.tsx",
       "parent": "/_app",
       "children": [
+        "/_app/_auth/_layout",
         "/_app/_auth/dashboard",
         "/_app/_auth/onboarding"
       ]
+    },
+    "/_app/_layout": {
+      "filePath": "_app/_layout.tsx",
+      "parent": "/_app"
+    },
+    "/_app/_auth/_layout": {
+      "filePath": "_app/_auth/_layout.tsx",
+      "parent": "/_app/_auth"
     },
     "/_app/login": {
       "filePath": "_app/login",

@@ -9,3 +9,4 @@ export const router = createRouter({
     queryClient: undefined!,
   },
 });
+console.log("ROUTE TREE:", routeTree);

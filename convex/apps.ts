@@ -1,6 +1,7 @@
 import { mutation, query } from "@cvx/_generated/server";
 import { v } from "convex/values";
 import { auth } from "@cvx/auth";
+import { internal } from "@cvx/_generated/api";
 
 /** Create a new App */
 export const createApp = mutation({
@@ -13,13 +14,22 @@ export const createApp = mutation({
     const userId = await auth.getUserId(ctx);
     if (!userId) throw new Error("Unauthorized");
 
-    return await ctx.db.insert("apps", {
+    const appId = await ctx.db.insert("apps", {
       name: args.name,
       region: args.region,
       description: args.description,
       ownerId: userId,
       createdAt: Date.now(),
     });
+
+    // Track analytics event
+    await ctx.runMutation(internal.analytics.trackEventInternal, {
+      appId: appId,
+      eventType: "app_created",
+      metadata: { name: args.name, region: args.region },
+    });
+
+    return appId;
   },
 });
 
@@ -74,6 +84,7 @@ export const updateInfo = mutation({
     appId: v.id("apps"),
     name: v.optional(v.string()),
     region: v.optional(v.string()),
+    description: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await auth.getUserId(ctx);
@@ -87,6 +98,7 @@ export const updateInfo = mutation({
     await ctx.db.patch(args.appId, {
       ...(args.name !== undefined && { name: args.name }),
       ...(args.region !== undefined && { region: args.region }),
+      ...(args.description !== undefined && { description: args.description }),
     });
   },
 });

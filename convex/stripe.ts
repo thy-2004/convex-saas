@@ -314,10 +314,32 @@ export const getCurrentUserSubscription = internalQuery({
         .unique(),
       ctx.db.get(args.planId),
     ]);
+    
+    // If no subscription exists, try to get the FREE plan as default
     if (!currentSubscription) {
+      const freePlan = await ctx.db
+        .query("plans")
+        .withIndex("key", (q) => q.eq("key", PLANS.FREE))
+        .unique();
+      
+      if (!freePlan) {
+        throw new Error("Free plan not found. Please initialize plans first.");
+      }
+      
+      return {
+        currentSubscription: {
+          planId: freePlan._id,
+          plan: freePlan,
+        },
+        newPlan,
+      };
+    }
+    
+    const currentPlan = await ctx.db.get(currentSubscription.planId);
+    if (!currentPlan) {
       throw new Error(ERRORS.STRIPE_SOMETHING_WENT_WRONG);
     }
-    const currentPlan = await ctx.db.get(currentSubscription.planId);
+    
     return {
       currentSubscription: {
         ...currentSubscription,
