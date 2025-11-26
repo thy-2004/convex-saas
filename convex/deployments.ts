@@ -38,6 +38,27 @@ export const createDeployment = mutation({
   },
 });
 
+export const updateStatus = mutation({
+  args: {
+    id: v.id("deployments"),
+    status: v.string(),
+  },
+  handler: async (ctx, { id, status }) => {
+    const deployment = await ctx.db.get(id);
+    if (!deployment) throw new Error("Deployment not found");
+
+    await ctx.db.patch(id, { status });
+
+    // Track analytics event
+    await ctx.runMutation(internal.analytics.trackEventInternal, {
+      appId: deployment.appId,
+      eventType: "deployment_status_updated",
+      metadata: { name: deployment.name, status },
+      deploymentId: id,
+    });
+  },
+});
+
 export const deleteDeployment = mutation({
   args: { id: v.id("deployments") },
   handler: async (ctx, { id }) => {

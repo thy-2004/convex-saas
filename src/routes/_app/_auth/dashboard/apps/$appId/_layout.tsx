@@ -5,8 +5,9 @@ export const Route = createFileRoute(
 )({
   beforeLoad: ({ location, params }) => {
     const path = location.pathname;
-    // Nếu thiếu dấu "/" thì redirect đúng route
-    if (!path.endsWith("/")) {
+    // Nếu path không kết thúc bằng "/" và không có sub-route, redirect
+    // Check if path ends with just the appId (no trailing slash, no sub-routes)
+    if (path === `/_app/_auth/dashboard/apps/${params.appId}`) {
       throw redirect({
         to: "/_app/_auth/dashboard/apps/$appId/",
         params: { appId: params.appId },
